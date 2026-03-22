@@ -15,10 +15,17 @@ class TriageService {
 
     const customerName = trimAndCapitalize(cv.customer_name);
     const customerAddress = trimAndCapitalize(cv.customer_address);
+    const customerPhone = cv.customer_phone?.trim() || null;
     const issueType = (cv.issue_type as IssueType) ?? null;
     const zipCode = normalizeZipCode(cv.zip_code);
 
-    const triage = this.triageCall(issueType, zipCode, customerName, customerAddress);
+    const triage = this.triageCall(
+      issueType,
+      zipCode,
+      customerName,
+      customerAddress,
+      customerPhone,
+    );
 
     return {
       call_id: payload.call_id,
@@ -27,6 +34,7 @@ class TriageService {
       recording_url: payload.recording_url,
       customer_name: customerName,
       customer_address: customerAddress,
+      customer_phone: customerPhone,
       issue_type: issueType,
       zip_code: zipCode,
       triage,
@@ -39,8 +47,15 @@ class TriageService {
     zipCode: string | null,
     customerName: string | null,
     customerAddress: string | null,
+    customerPhone: string | null,
   ): TriageResult {
-    const missingFields = this.findMissingFields(customerName, customerAddress, issueType, zipCode);
+    const missingFields = this.findMissingFields(
+      customerName,
+      customerAddress,
+      issueType,
+      zipCode,
+      customerPhone,
+    );
     const dataStatus: DataCompleteness = missingFields.length > 0 ? 'INCOMPLETE' : 'COMPLETE';
     const isBerlin = zipCode ? isBerlinZipCode(zipCode) : false;
 
@@ -65,12 +80,14 @@ class TriageService {
     address: string | null,
     issueType: IssueType | null,
     zipCode: string | null,
+    phone: string | null,
   ): string[] {
     const missing: string[] = [];
     if (!name) missing.push('customer_name');
     if (!address) missing.push('customer_address');
     if (!issueType) missing.push('issue_type');
     if (!zipCode) missing.push('zip_code');
+    if (!phone) missing.push('customer_phone');
     return missing;
   }
 }

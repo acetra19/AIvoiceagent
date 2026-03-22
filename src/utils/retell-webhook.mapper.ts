@@ -1,8 +1,10 @@
 import type { RetellWebhookPayload } from '../models';
+import { normalizePhoneNumber } from './sanitizer';
 
 /** Retell POST body for call lifecycle events (subset). */
 interface RetellCallObject {
   call_id: string;
+  from_number?: string;
   transcript?: string;
   start_timestamp?: number;
   end_timestamp?: number;
@@ -24,10 +26,18 @@ function durationSeconds(call: RetellCallObject): number {
   return 0;
 }
 
-function pickIssueType(
-  v: string | undefined,
-): 'Emergency' | 'Routine' | undefined {
-  if (v === 'Emergency' || v === 'Routine') return v;
+/** Maps Retell extract output (EN/DE/mixed) to internal enum. */
+function pickIssueType(v: string | undefined): 'Emergency' | 'Routine' | undefined {
+  if (!v) return undefined;
+  const t = v.trim();
+  if (t === 'Emergency' || t === 'Routine') return t;
+  const lower = t.toLowerCase();
+  if (/notfall|emergency|rohrbruch|wasserschaden|wasseraustritt|überflut|ueberflut|akut|undicht/i.test(lower)) {
+    return 'Emergency';
+  }
+  if (/routine|geplant|termin|wartung|verlege|installation/i.test(lower)) {
+    return 'Routine';
+  }
   return undefined;
 }
 
@@ -41,6 +51,14 @@ export function mapRetellCallEndedToPayload(
   const call = body.call!;
   const dyn = call.retell_llm_dynamic_variables ?? {};
 
+  const phoneRaw =
+    dyn.customer_phone ?? dyn.phone_number ?? dyn.callback_phone ?? call.from_number;
+  let customerPhone: string | undefined;
+  if (phoneRaw?.trim()) {
+    const normalized = normalizePhoneNumber(phoneRaw);
+    customerPhone = normalized ?? phoneRaw.trim();
+  }
+
   const payload: RetellWebhookPayload = {
     call_id: call.call_id,
     transcript: call.transcript ?? '',
@@ -48,6 +66,7 @@ export function mapRetellCallEndedToPayload(
     custom_variables: {
       customer_name: dyn.customer_name,
       customer_address: dyn.customer_address,
+      customer_phone: customerPhone,
       issue_type: pickIssueType(dyn.issue_type),
       zip_code: dyn.zip_code,
     },

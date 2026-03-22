@@ -7,6 +7,7 @@ export type DataCompleteness = 'COMPLETE' | 'INCOMPLETE';
 export interface CallCustomVariables {
   customer_name?: string;
   customer_address?: string;
+  customer_phone?: string;
   issue_type?: IssueType;
   zip_code?: string;
 }
@@ -33,6 +34,7 @@ export interface ProcessedCall {
   recording_url?: string;
   customer_name: string | null;
   customer_address: string | null;
+  customer_phone: string | null;
   issue_type: IssueType | null;
   zip_code: string | null;
   triage: TriageResult;

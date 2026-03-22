@@ -9,6 +9,7 @@ export const retellWebhookSchema = z.object({
     .object({
       customer_name: z.string().optional(),
       customer_address: z.string().optional(),
+      customer_phone: z.string().optional(),
       issue_type: z.enum(['Emergency', 'Routine']).optional(),
       zip_code: z.string().optional(),
     })
