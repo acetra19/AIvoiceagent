@@ -1,0 +1,36 @@
+# n8n + Caddy (HTTPS) on VPS — copy to server, edit Caddyfile + .env, then: docker compose up -d
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - n8n
+
+  n8n:
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    expose:
+      - "5678"
+    environment:
+      - N8N_HOST=${N8N_HOST}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://${N8N_HOST}/
+      - GENERIC_TIMEZONE=Europe/Berlin
+      - N8N_SECURE_COOKIE=true
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:
+  caddy_data:
+  caddy_config:

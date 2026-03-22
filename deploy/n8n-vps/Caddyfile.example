@@ -1,0 +1,6 @@
+# 1) Kopieren: cp Caddyfile.example Caddyfile
+# 2) n8n.deinedomain.de durch deine echte Subdomain ersetzen (muss per DNS auf die VPS-IP zeigen)
+
+n8n.deinedomain.de {
+	reverse_proxy n8n:5678
+}

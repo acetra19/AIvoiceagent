@@ -1,0 +1,52 @@
+{
+  "name": "handwerker-ai",
+  "version": "1.0.0",
+  "description": "Voice AI Middleware for Berlin plumbing firms – Retell AI to n8n webhook hub",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "lint": "eslint src/ --ext .ts",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "keywords": [
+    "retell-ai",
+    "voice-agent",
+    "plumber",
+    "n8n",
+    "webhook"
+  ],
+  "license": "PRIVATE",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.13.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "retell-sdk": "^5.9.0",
+    "uuid": "^13.0.0",
+    "winston": "^3.19.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.5.0",
+    "@types/uuid": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.1",
+    "@typescript-eslint/parser": "^8.57.1",
+    "eslint": "^10.1.0",
+    "jest": "^30.3.0",
+    "ts-jest": "^29.4.6",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

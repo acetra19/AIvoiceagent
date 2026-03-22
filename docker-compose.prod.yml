@@ -1,0 +1,26 @@
+# Production on VPS: only nginx on the host reaches the app (port 3000 on loopback).
+# Usage (repo root): docker compose -f docker-compose.prod.yml up -d --build
+services:
+  handwerker-ai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: handwerker-ai
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - app-logs:/app/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+volumes:
+  app-logs:
+    driver: local

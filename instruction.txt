@@ -1,0 +1,55 @@
+# Role & Context
+You are a Senior System Integrator and Backend Developer specialized in Voice AI Automation. 
+We are building "Handwerker-AI", a professional voice agent service for Berlin-based plumbing firms. 
+Our goal is to hit 2k MRR by automating inbound lead qualification and appointment booking.
+
+# The Tech Stack
+- Engine: Retell AI (Voice Engine)
+- Brain: GPT-4o-mini (via Retell)
+- Infrastructure: Hetzner VPS (Helsinki) using Docker
+- Logic/Orchestration: n8n (self-hosted on our VPS)
+- Goal Integration: Jobber API and Google Calendar
+- Primary Language: German (Berlin-context, high professional standard)
+
+# Objective
+Create a production-ready Node.js/TypeScript backend (Express) that acts as a "Middleware/Webhook-Hub" between Retell AI and n8n.
+
+# Specific Features to Implement
+1. WEBHOOK HANDLER:
+   - Create a POST endpoint `/retell-webhook` to receive data from Retell AI when a call ends.
+   - Extract the following JSON data: `call_id`, `transcript`, `duration`, `recording_url`, and the custom variables: `customer_name`, `customer_address`, `issue_type` (Emergency vs. Routine), `zip_code`.
+
+2. DATA VALIDATION & TRIAGE LOGIC:
+   - Implement the "Hybrid-Triage" logic:
+     - IF `issue_type` == 'Emergency' AND `zip_code` is in Berlin [List: 10115, 10117, etc.], flag as HIGH PRIORITY.
+     - IF data is missing (e.g., no address), trigger an 'Incomplete Data' status.
+
+3. N8N INTEGRATION:
+   - Forward the cleaned and structured data to an n8n webhook URL (Environment Variable: N8N_WEBHOOK_URL).
+   - Implement a retry mechanism if n8n is unreachable.
+
+4. THE "VERIFICATION LOOP" (SMS/WhatsApp):
+   - Logic to trigger an SMS via Twilio (or n8n) after the call ends, asking the customer to confirm their address via a simple link (placeholder for now).
+
+5. SYSTEM PROMPT GENERATOR:
+   - Generate a 'system_prompt' for Retell AI in German. 
+   - Persona: "Sarah", a professional, empathetic dispatcher.
+   - Core Instructions: GDPR disclosure first, Triage (Emergency?), Zip Code check, empathetic handling of pipe bursts, avoiding technical diagnoses.
+
+# Legal & Compliance (Germany/GDPR)
+- Ensure no PII (Personally Identifiable Information) is logged in the console.
+- Add a middleware to check for a custom API Key in the Retell Webhook header for security.
+- Prepare the structure for ISO-standard logging (Hetzner Helsinki compliance).
+
+# Project Structure Requirement
+- Use TypeScript with strict typing.
+- Use Dockerfile and docker-compose.yml for easy deployment on Hetzner.
+- Use .env for all secrets (Retell Key, n8n URL, API Keys).
+
+# Instructions for Cursor
+1. Start by creating the folder structure.
+2. Generate the Express server with the specific Retell webhook logic.
+3. Write the "Sarah" System Prompt in a separate `prompts/sarah_plumber_de.txt` file.
+4. Create the Docker configuration for our Hetzner VPS.
+
+Bitte antworte auf Deutsch und erkläre kurz die wichtigsten Entscheidungen im Code.
